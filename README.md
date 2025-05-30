@@ -1,5 +1,5 @@
 ﻿# TrainingTestApp
-Приложения написано на Kotlin Corutine в качестве ui фраймворака view-xml
+Приложения написано на Kotlin c корутинами и flow в качестве ui фраймворака view-xml
 
 Приложени поделено на 3 слоя data, domain, presenter в качестве di использовался dagger/hilt
 
