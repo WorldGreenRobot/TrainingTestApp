@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tint_icon_color">#FFFFFFFF</color>
+    <color name="brand_component_gray_light">#393C41</color>
+</resources>

@@ -1,0 +1,15 @@
+<resources>
+    <string name="app_name">TreningTest</string>
+    <string name="training_list">Список тренировок</string>
+    <string name="training">Тренировка</string>
+    <string name="update">ОБНОВИТЬ</string>
+    <string name="item_training_type">Тренировка</string>
+    <string name="item_broadcast_type">Эфир</string>
+    <string name="item_complex_type">Комплекс</string>
+    <string name="item_unknown_type">Неизвестно</string>
+    <string name="search_title">Поиск</string>
+    <string name="type_filter_title">Фильтр</string>
+    <string name="change_quality_video">Выбор качества видео</string>
+    <string name="change_playback_speed">Выбор скорости видео</string>
+    <string name="na">N/A</string>
+</resources>

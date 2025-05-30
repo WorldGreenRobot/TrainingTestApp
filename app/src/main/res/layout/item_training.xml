@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginHorizontal="8dp"
+    app:cardCornerRadius="8dp">
+
+    <LinearLayout
+        android:id="@+id/container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:minHeight="80dp"
+        android:orientation="vertical"
+        android:padding="8dp">
+
+        <TextView
+            android:id="@+id/title_training"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:minHeight="24sp"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            tools:text="Утренняя пробежка" />
+
+        <TextView
+            android:id="@+id/description_training"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="18dp"
+            android:textSize="18sp"
+            tools:text="Идеальная пробежка для старта дня" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:minHeight="18dp"
+            android:orientation="horizontal">
+
+            <TextView
+                android:id="@+id/type_training"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:layout_weight="1"
+                android:textSize="18sp"
+                tools:text="Тренировка" />
+
+            <TextView
+                android:id="@+id/duration_training"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAlignment="textEnd"
+                android:textSize="18sp"
+                android:minWidth="100dp"
+                tools:text="30 минут" />
+
+        </LinearLayout>
+    </LinearLayout>
+</androidx.cardview.widget.CardView>
+
+    <!--   val id: Int,
+        val title: String,
+        val description: String,
+        val type: TypeTraining,
+        val duration: String-->
