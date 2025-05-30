@@ -83,7 +83,6 @@ class TrainingFragment : BaseFragment() {
         repeatOnStart {
             viewModel.state.collect {
                 binding.swipeRefresh.isRefreshing = it.showRefresh
-                initializePlayer("https://sample.vodobox.net/skate_phantom_flex_4k/skate_phantom_flex_4k.m3u8")
                 showSkeleton(it.showSkeleton)
                 if (it.error != null) {
                     val snackbar = Snackbar.make(view, it.error, Snackbar.LENGTH_LONG)

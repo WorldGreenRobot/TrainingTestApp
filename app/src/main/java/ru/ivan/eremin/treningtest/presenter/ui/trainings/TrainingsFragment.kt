@@ -52,12 +52,10 @@ class TrainingsFragment : BaseFragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initUi()
+        createMenu()
         repeatOnStart {
             viewModel.state.collect {
                 showTraining(it.data.orEmpty())
-                if (!it.filters.orEmpty().isEmpty()) {
-                    createMenu()
-                }
                 binding.swipeRefresh.isRefreshing = it.showRefresh
                 if (it.error != null) {
                     val snackbar = Snackbar.make(view, it.error, Snackbar.LENGTH_INDEFINITE)
