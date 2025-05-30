@@ -84,6 +84,7 @@ class TrainingFragment : BaseFragment() {
             viewModel.state.collect {
                 binding.swipeRefresh.isRefreshing = it.showRefresh
                 showSkeleton(it.showSkeleton)
+                initializePlayer(it.data?.link.orEmpty())
                 if (it.error != null) {
                     val snackbar = Snackbar.make(view, it.error, Snackbar.LENGTH_LONG)
                     snackbar.setAction(getString(R.string.update)) {
@@ -122,7 +123,7 @@ class TrainingFragment : BaseFragment() {
     }
 
     private fun initializePlayer(url: String) {
-        if (exoPlayer != null) return
+        if (exoPlayer != null || url.isBlank()) return
         val context = requireContext()
         val trackSelector = DefaultTrackSelector(context)
 
