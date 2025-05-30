@@ -14,7 +14,6 @@ import kotlinx.coroutines.launch
 
 abstract class BaseViewModel<State : UiState> : ViewModel() {
 
-    // Create Initial State of View
     private val initialState: State by lazy { createInitialState() }
     abstract fun createInitialState(): State
 
