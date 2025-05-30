@@ -5,9 +5,10 @@ import ru.ivan.eremin.treningtest.presenter.ui.base.UiState
 import ru.ivan.eremin.treningtest.presenter.ui.entity.Training
 
 data class TrainingsUiState(
-    val showSkeleton: Boolean = true,
-    val showRefresh: Boolean = false,
+    val showRefresh: Boolean = true,
     val data: List<Training>? = null,
     val filters: List<Filter>? = null,
     val error: String? = null
-) : UiState
+) : UiState {
+    val showSkeleton: Boolean = data?.firstOrNull { it is Training.Skeleton } != null
+}

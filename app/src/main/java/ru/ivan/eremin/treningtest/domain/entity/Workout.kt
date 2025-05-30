@@ -1,8 +1,10 @@
 package ru.ivan.eremin.treningtest.domain.entity
 
+import androidx.compose.runtime.Immutable
 import kotlinx.serialization.Serializable
 
 @Serializable
+@Immutable
 data class Workout(
     val id: Int,
     val title: String,
