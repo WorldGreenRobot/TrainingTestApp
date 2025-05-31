@@ -2,11 +2,11 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_main"
-    app:startDestination="@id/trainingsFragment">
+    app:startDestination="@id/trainingsComposeFragment">
 
     <fragment
-        android:id="@+id/trainingsFragment"
-        android:name="ru.ivan.eremin.treningtest.presenter.ui.trainings.TrainingsFragment"
+        android:id="@+id/trainingsComposeFragment"
+        android:name="ru.ivan.eremin.treningtest.presenter.ui.trainings.TrainingsComposeFragment"
         android:label="TrainingsFragment" >
         <action
             android:id="@+id/action_trainingsFragment_to_trainingFragment"

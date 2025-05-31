@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalMaterial3Api::class)
+
 package ru.ivan.eremin.treningtest.presenter.ui.trainings
 
 import android.os.Bundle
@@ -8,6 +10,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,26 +19,38 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.fragment.app.Fragment
 import androidx.hilt.navigation.compose.hiltViewModel
 import ru.ivan.eremin.treningtest.R
 import ru.ivan.eremin.treningtest.domain.entity.TypeTraining
 import ru.ivan.eremin.treningtest.domain.entity.Workout
+import ru.ivan.eremin.treningtest.presenter.exteption.getString
+import ru.ivan.eremin.treningtest.presenter.ui.base.BaseFragment
+import ru.ivan.eremin.treningtest.presenter.ui.base.Screen
+import ru.ivan.eremin.treningtest.presenter.ui.component.SearchableTopAppBar
 import ru.ivan.eremin.treningtest.presenter.ui.entity.Training
 
-class TrainingsComposeFragment : Fragment() {
+class TrainingsComposeFragment : BaseFragment() {
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -55,30 +71,72 @@ private fun TrainingsScreen(
     val state = viewModel.state.collectAsState()
 
     TrainingsScreenState(
-        state = state.value
+        state = state.value,
+        onAction = remember {
+            {
+                handlerAction(it, viewModel)
+            }
+        }
     )
 }
 
 @Composable
 private fun TrainingsScreenState(
-    state: TrainingsUiState
+    state: TrainingsUiState,
+    onAction: (TrainingAction) -> Unit = {}
 ) {
-    LazyColumn(
-        modifier = Modifier,
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        items(state.data.orEmpty()) {
-            if (it is Training.Success) {
-                TrainingItem(
-                    item = it.data,
-                    modifier = Modifier.fillMaxWidth()
-                )
-            } else {
-                TrainingItemSkeleton(
-                    modifier = Modifier.fillMaxWidth()
-                )
-            }
 
+    val isShowSearch = remember { mutableStateOf(false) }
+
+    Screen(
+        topBar = {
+            SearchableTopAppBar(
+                title = {
+                    Text(text = stringResource(R.string.training))
+                },
+                currentSearchQuery = "",
+                onSearchQueryChange = {},
+                onSearchExecute = {},
+                isSearchActive = isShowSearch.value,
+                onSearchActiveChange = {
+                    isShowSearch.value = it
+                },
+                onCloseSearch = {
+                    isShowSearch.value = false
+                },
+                actions = {
+                    IconButton(onClick = { onAction(TrainingAction.OnRefresh) }) {
+                        Icon(
+                            imageVector = ImageVector.vectorResource(R.drawable.filter_list_24),
+                            contentDescription = null
+                        )
+                    }
+                }
+            )
+        },
+        isRefreshing = state.showRefresh,
+        onRefresh = {
+            onAction(TrainingAction.OnRefresh)
+        },
+        uiError = state.error,
+    ) {
+        LazyColumn(
+            modifier = Modifier,
+            verticalArrangement = Arrangement.spacedBy(8.dp),
+            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp)
+        ) {
+            items(state.data.orEmpty()) {
+                if (it is Training.Success) {
+                    TrainingItem(
+                        item = it.data,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    TrainingItemSkeleton(
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
         }
     }
 }
@@ -97,14 +155,45 @@ private fun TrainingItem(
     ) {
         Column(
             modifier = Modifier
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             Text(
                 text = item.title,
                 style = MaterialTheme.typography.titleLarge,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(8.dp)
+                modifier = Modifier
             )
+
+            if (item.description.isNotBlank())
+                Text(
+                    text = item.description,
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 18.sp,
+                    fontStyle = FontStyle.Italic,
+                    modifier = Modifier
+                )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = item.type.getString(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 18.sp
+                )
+
+                Text(
+                    text = pluralStringResource(
+                        R.plurals.minutes,
+                        item.duration,
+                        item.duration
+                    ),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontSize = 18.sp,
+                )
+            }
         }
     }
 }
@@ -113,14 +202,29 @@ private fun TrainingItem(
 private fun TrainingItemSkeleton(
     modifier: Modifier = Modifier
 ) {
-    Box(
+    Card(
         modifier = modifier
             .background(
-                colorResource(R.color.skeletonColor),
+                colorResource(R.color.white),
                 RoundedCornerShape(8.dp)
             )
-            .height(200.dp)
-    )
+    ) {
+        Box(
+            modifier = modifier
+                .background(colorResource(R.color.skeletonColor))
+                .height(200.dp)
+        )
+    }
+}
+
+sealed interface TrainingAction {
+    data object OnRefresh : TrainingAction
+}
+
+private fun handlerAction(action: TrainingAction, viewModel: TrainingsViewModel) {
+    when (action) {
+        TrainingAction.OnRefresh -> viewModel.refresh()
+    }
 }
 
 @Composable
@@ -187,6 +291,7 @@ private fun TrainingsScreenSkeleton_Preview() {
     MaterialTheme {
         TrainingsScreenState(
             state = TrainingsUiState(
+                showRefresh = false,
                 data = listOf(
                     Training.Skeleton,
                     Training.Skeleton,

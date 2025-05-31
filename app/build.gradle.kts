@@ -56,12 +56,15 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
+    implementation(libs.compose.foundation)
     implementation(libs.material)
     implementation(libs.androidx.activity)
     implementation(libs.androidx.constraintlayout)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
+    androidTestImplementation(libs.material.icons.core)
+    androidTestImplementation(libs.material.icons.extended)
     implementation(libs.retrofit)
     implementation(libs.okhttp)
     implementation(libs.bundles.exoplayer)
@@ -82,5 +85,5 @@ dependencies {
     implementation(libs.androidx.navigation3.runtime)
     implementation(libs.androidx.navigation3.ui)
     implementation(libs.kotlinx.serialization.core)
-
+    implementation(libs.bundles.accompanist)
 }
