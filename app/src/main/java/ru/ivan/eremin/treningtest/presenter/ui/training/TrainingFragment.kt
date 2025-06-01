@@ -1,21 +1,18 @@
 package ru.ivan.eremin.treningtest.presenter.ui.training
 
-import android.content.Context
 import android.content.pm.ActivityInfo
-import android.os.Build
+import android.content.res.Configuration
 import android.os.Bundle
-import android.util.TypedValue
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.view.WindowInsets
-import android.view.WindowInsetsController
-import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
-import androidx.constraintlayout.widget.ConstraintSet
+import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import androidx.fragment.app.viewModels
 import androidx.media3.common.C
 import androidx.media3.common.Format
@@ -32,7 +29,7 @@ import androidx.media3.exoplayer.hls.HlsMediaSource
 import androidx.media3.exoplayer.source.MediaSource
 import androidx.media3.exoplayer.source.ProgressiveMediaSource
 import androidx.media3.exoplayer.trackselection.DefaultTrackSelector
-import androidx.media3.ui.PlayerView
+import androidx.media3.ui.PlayerView.FullscreenButtonClickListener
 import com.google.android.material.snackbar.Snackbar
 import dagger.hilt.android.AndroidEntryPoint
 import ru.ivan.eremin.treningtest.R
@@ -55,6 +52,7 @@ class TrainingFragment : BaseFragment() {
     private var videoTrackGroup: Tracks.Group? = null
     private var speedButton: TextView? = null
     private var qualityButton: TextView? = null
+    private var isFullScreen = false
     private val speeds = arrayOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
     private val speedLabels =
         arrayOf("0.5x", "0.75x", "Normal (1.0x)", "1.25x", "1.5x", "1.75x", "2.0x")
@@ -64,7 +62,7 @@ class TrainingFragment : BaseFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTrainingBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -78,6 +76,9 @@ class TrainingFragment : BaseFragment() {
         binding.toolbar.setNavigationOnClickListener {
             navController.popBackStack()
         }
+        binding.playerView.setFullscreenButtonClickListener(
+            fullScreenButtonListener
+        )
 
         showDescription(workout.description)
         repeatOnStart {
@@ -152,8 +153,66 @@ class TrainingFragment : BaseFragment() {
         speedButton?.setOnClickListener {
             showSpeedSelectionDialog()
         }
-        exoPlayer?.addListener(playerListener)
 
+        exoPlayer?.addListener(playerListener)
+    }
+
+    private val fullScreenButtonListener = FullscreenButtonClickListener {
+        if (it) {
+            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+            openFullScreen()
+        } else {
+            requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+            exitFullScreen()
+        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration) {
+        super.onConfigurationChanged(newConfig)
+        if (newConfig.orientation == Configuration.ORIENTATION_LANDSCAPE) {
+            openFullScreen()
+            binding.playerView.setFullscreenButtonState(true)
+            //requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        } else if (newConfig.orientation == Configuration.ORIENTATION_PORTRAIT) {
+            exitFullScreen()
+            binding.playerView.setFullscreenButtonState(false)
+        }
+    }
+
+    private fun exitFullScreen() {
+        if (!isFullScreen) return
+        isFullScreen = false
+        //requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
+        WindowInsetsControllerCompat(requireActivity().window, binding.playerView).show(
+            WindowInsetsCompat.Type.systemBars()
+        )
+        val params = binding.playerView.layoutParams as ConstraintLayout.LayoutParams
+        params.width = 0
+        params.height = 0
+        params.dimensionRatio = "16:9"
+        binding.playerView.layoutParams = params
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.show()
+        binding.detailVideo.visibility = View.VISIBLE
+    }
+
+    private fun openFullScreen() {
+        if (isFullScreen) return
+        isFullScreen = true
+        //requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+        WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
+        WindowInsetsControllerCompat(requireActivity().window, binding.playerView).let {
+            it.hide(WindowInsetsCompat.Type.systemBars())
+            it.systemBarsBehavior =
+                WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+        }
+        val params = binding.playerView.layoutParams as ConstraintLayout.LayoutParams
+        params.width = ViewGroup.LayoutParams.MATCH_PARENT
+        params.height = ViewGroup.LayoutParams.MATCH_PARENT
+        params.dimensionRatio = null
+        binding.playerView.layoutParams = params
+        (requireActivity() as? AppCompatActivity)?.supportActionBar?.hide()
+        binding.detailVideo.visibility = View.GONE
     }
 
     private val playerListener = object : Player.Listener {
@@ -167,7 +226,6 @@ class TrainingFragment : BaseFragment() {
             super.onTracksChanged(tracks)
             updateAvailableQualities(tracks)
             updateQualityText()
-
         }
     }
 
@@ -220,7 +278,7 @@ class TrainingFragment : BaseFragment() {
         var checkedItemIndex = 0
         val currentTrackSelectionParameters = exoPlayer?.trackSelectionParameters
         val videoOverride =
-            currentTrackSelectionParameters?.overrides[currentVideoTrackGroup.mediaTrackGroup]
+            currentTrackSelectionParameters?.overrides?.get(currentVideoTrackGroup.mediaTrackGroup)
 
         if (videoOverride != null) {
             val selectedTrackIndexInOverride = videoOverride.trackIndices.firstOrNull()
@@ -299,7 +357,7 @@ class TrainingFragment : BaseFragment() {
 
         val currentTrackSelectionParameters = exoPlayer?.trackSelectionParameters
         val videoOverride: TrackSelectionOverride? =
-            currentTrackSelectionParameters?.overrides[currentVideoTrackGroup.mediaTrackGroup]
+            currentTrackSelectionParameters?.overrides?.get(currentVideoTrackGroup.mediaTrackGroup)
 
         if (videoOverride != null) {
             val selectedTrackIndexInOverride = videoOverride.trackIndices.firstOrNull()
@@ -349,4 +407,6 @@ class TrainingFragment : BaseFragment() {
         exoPlayer = null
         trackSelector = null
     }
+
+
 }
