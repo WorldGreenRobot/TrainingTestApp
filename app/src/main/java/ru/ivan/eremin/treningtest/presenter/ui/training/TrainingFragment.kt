@@ -407,6 +407,4 @@ class TrainingFragment : BaseFragment() {
         exoPlayer = null
         trackSelector = null
     }
-
-
 }
