@@ -33,18 +33,15 @@ class TrainingsFragment : BaseFragment() {
 
     private var _binding: FragmentTrainingsBinding? = null
     private val binding get() = _binding!!
-
+    private var menuInvisible: Boolean = false
     private var workoutAdapter: WorkoutAdapter? = null
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
+    private var menuHost: MenuHost? = null
 
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentTrainingsBinding.inflate(inflater, container, false)
         return binding.root
     }
@@ -56,6 +53,7 @@ class TrainingsFragment : BaseFragment() {
         repeatOnStart {
             viewModel.state.collect {
                 showTraining(it.data.orEmpty())
+                setInvisibleMenu(!it.filters.isNullOrEmpty())
                 binding.swipeRefresh.isRefreshing = it.showRefresh
                 if (it.error != null) {
                     val snackbar = Snackbar.make(view, it.error, Snackbar.LENGTH_INDEFINITE)
@@ -67,6 +65,11 @@ class TrainingsFragment : BaseFragment() {
                 }
             }
         }
+    }
+
+    private fun setInvisibleMenu(isInvisible: Boolean) {
+        menuInvisible = isInvisible
+        menuHost?.invalidateMenu()
     }
 
     private fun initUi() {
@@ -91,14 +94,24 @@ class TrainingsFragment : BaseFragment() {
     }
 
     private fun createMenu() {
-        val menuHost: MenuHost = requireActivity()
-        menuHost.addMenuProvider(object : MenuProvider {
+        menuHost = requireActivity()
+        menuHost?.addMenuProvider(object : MenuProvider {
+            override fun onPrepareMenu(menu: Menu) {
+                val searchMenuItem = menu.findItem(R.id.action_search)
+                val filterMenuItem = menu.findItem(R.id.action_filter)
+                searchMenuItem.isVisible = menuInvisible
+                filterMenuItem.isVisible = menuInvisible
+                super.onPrepareMenu(menu)
+            }
             override fun onCreateMenu(
                 menu: Menu,
                 menuInflater: MenuInflater
             ) {
                 menuInflater.inflate(R.menu.training_app_bar_menu, menu)
-                createSearchView(menu)
+                val menuItemSearch = menu.findItem(R.id.action_search)
+                menuItemSearch?.let {
+                    createSearchView(it)
+                }
             }
 
             override fun onMenuItemSelected(menuItem: MenuItem): Boolean {
@@ -123,8 +136,7 @@ class TrainingsFragment : BaseFragment() {
         }, viewLifecycleOwner, Lifecycle.State.RESUMED)
     }
 
-    private fun createSearchView(menu: Menu) {
-        val searchItem = menu.findItem(R.id.action_search)
+    private fun createSearchView(searchItem: MenuItem) {
         val searchView = searchItem.actionView as SearchView
 
         searchView.queryHint = getString(R.string.search_title)
