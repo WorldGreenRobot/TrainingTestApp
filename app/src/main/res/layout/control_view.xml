@@ -96,6 +96,12 @@
                 android:textStyle="bold"
                 android:text="@string/na"
                 android:layout_marginStart="8dp" />
+
+            <ImageButton
+                android:id="@+id/exo_fullscreen"
+                style="@style/ExoStyledControls.Button.Bottom.FullScreen"
+                android:layout_width="48dp"
+                android:layout_height="48dp"/>
         </LinearLayout>
 
     </LinearLayout>
