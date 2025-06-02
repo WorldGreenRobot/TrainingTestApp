@@ -21,7 +21,7 @@ class FilterTrainingDialog : DialogFragment() {
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = DialogTrainingFilterBinding.inflate(inflater, container, false)
         return binding.root
     }

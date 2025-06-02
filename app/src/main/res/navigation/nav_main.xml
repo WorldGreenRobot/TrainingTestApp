@@ -10,10 +10,14 @@
         android:label="TrainingsFragment" >
         <action
             android:id="@+id/action_trainingsFragment_to_trainingFragment"
-            app:destination="@id/trainingFragment" />
+            app:destination="@id/trainingFragment"
+            app:enterAnim="@anim/slide_in_right"
+            app:exitAnim="@anim/slide_out_left"
+            app:popEnterAnim="@anim/slide_in_left"
+            app:popExitAnim="@anim/slide_out_right"/>
     </fragment>
     <fragment
         android:id="@+id/trainingFragment"
         android:name="ru.ivan.eremin.treningtest.presenter.ui.training.TrainingFragment"
-        android:label="TrainingFragment" />
+        android:label="TrainingFragment"/>
 </navigation>
