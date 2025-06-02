@@ -37,28 +37,13 @@
             android:layout_height="match_parent"
             android:orientation="vertical">
 
-            <androidx.media3.ui.PlayerView
-                android:id="@+id/player_view"
-                android:layout_width="0dp"
-                android:layout_height="250dp"
-                android:background="@color/black"
-                app:controller_layout_id="@layout/control_view"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:played_color="@color/black"
-                app:scrubber_color="@color/black"
-                app:shutter_background_color="@color/black"
-                app:use_controller="true" />
-
             <androidx.core.widget.NestedScrollView
                 android:id="@+id/detail_video"
                 android:layout_width="0dp"
-                android:layout_height="0dp"
-                app:layout_constraintBottom_toBottomOf="parent"
+                android:layout_height="wrap_content"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/player_view">
+                app:layout_constraintTop_toTopOf="parent">
 
                 <androidx.constraintlayout.widget.ConstraintLayout
                     android:id="@+id/video_info"
@@ -66,21 +51,35 @@
                     android:layout_height="match_parent"
                     android:orientation="vertical">
 
+                    <androidx.media3.ui.PlayerView
+                        android:id="@+id/player_view"
+                        android:layout_width="0dp"
+                        android:layout_height="250dp"
+                        android:background="@color/black"
+                        app:controller_layout_id="@layout/control_view"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:played_color="@color/black"
+                        app:scrubber_color="@color/black"
+                        app:shutter_background_color="@color/black"
+                        app:use_controller="true" />
+
                     <ru.ivan.eremin.treningtest.presenter.view.LoadingTextView
                         android:id="@+id/duration_training"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="end"
                         android:layout_marginHorizontal="16dp"
-                        android:layout_marginTop="16dp"
                         android:minWidth="50dp"
                         android:minHeight="18dp"
                         android:textAlignment="textEnd"
                         android:textSize="18sp"
+                        app:layout_constraintTop_toBottomOf="@id/player_view"
                         app:layout_constraintEnd_toEndOf="parent"
                         app:layout_constraintHorizontal_bias="1.0"
                         app:layout_constraintStart_toStartOf="parent"
-                        app:layout_constraintTop_toTopOf="parent"
+                        tools:layout_editor_absoluteY="16dp"
                         tools:text="30 мин" />
 
                     <ru.ivan.eremin.treningtest.presenter.view.LoadingTextView
@@ -98,6 +97,17 @@
 
                 </androidx.constraintlayout.widget.ConstraintLayout>
             </androidx.core.widget.NestedScrollView>
+            <FrameLayout
+                android:id="@+id/fullscreen_player_host"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:background="@android:color/black"
+                android:visibility="gone"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                tools:visibility="visible"/>
         </androidx.constraintlayout.widget.ConstraintLayout>
 
     </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

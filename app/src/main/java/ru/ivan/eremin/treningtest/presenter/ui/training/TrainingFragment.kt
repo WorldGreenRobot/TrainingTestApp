@@ -6,6 +6,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.FrameLayout
 import android.widget.TextView
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
@@ -56,7 +57,9 @@ class TrainingFragment : BaseFragment() {
     private val speeds = arrayOf(0.5f, 0.75f, 1.0f, 1.25f, 1.5f, 1.75f, 2.0f)
     private val speedLabels =
         arrayOf("0.5x", "0.75x", "Normal (1.0x)", "1.25x", "1.5x", "1.75x", "2.0x")
-
+    private var originalLayoutParams: ViewGroup.LayoutParams? = null
+    private var normalParent: ViewGroup? = null
+    private var originalPlayerViewIndex: Int = -1
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -182,7 +185,17 @@ class TrainingFragment : BaseFragment() {
     private fun exitFullScreen() {
         if (!isFullScreen) return
         isFullScreen = false
-        //requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_UNSPECIFIED
+
+        binding.fullscreenPlayerHost.removeView(binding.playerView)
+        binding.fullscreenPlayerHost.visibility = View.GONE
+        binding.detailVideo.visibility = View.VISIBLE
+
+        if (normalParent != null && originalPlayerViewIndex != -1) {
+            normalParent?.addView(binding.playerView, originalPlayerViewIndex, originalLayoutParams)
+        } else if (normalParent != null) {
+            normalParent?.addView(binding.playerView, originalLayoutParams)
+        }
+
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, true)
         WindowInsetsControllerCompat(requireActivity().window, binding.playerView).show(
             WindowInsetsCompat.Type.systemBars()
@@ -193,26 +206,46 @@ class TrainingFragment : BaseFragment() {
         params.dimensionRatio = "16:9"
         binding.playerView.layoutParams = params
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.show()
-        binding.detailVideo.visibility = View.VISIBLE
+        binding.durationTraining.visibility = View.VISIBLE
+        binding.description.visibility = View.VISIBLE
     }
 
     private fun openFullScreen() {
         if (isFullScreen) return
         isFullScreen = true
-        //requireActivity().requestedOrientation = ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE
+
+        originalLayoutParams = binding.playerView.layoutParams
+
+        if (binding.playerView.parent is ViewGroup) {
+            normalParent = binding.playerView.parent as ViewGroup
+            originalPlayerViewIndex = normalParent?.indexOfChild(binding.playerView) ?: -1
+            normalParent?.removeView(binding.playerView)
+
+        }
+
+        binding.fullscreenPlayerHost.addView(
+            binding.playerView,
+            ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT
+            )
+        )
+        binding.fullscreenPlayerHost.visibility = View.VISIBLE
+        binding.detailVideo.visibility = View.GONE
+
         WindowCompat.setDecorFitsSystemWindows(requireActivity().window, false)
         WindowInsetsControllerCompat(requireActivity().window, binding.playerView).let {
             it.hide(WindowInsetsCompat.Type.systemBars())
             it.systemBarsBehavior =
                 WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
         }
-        val params = binding.playerView.layoutParams as ConstraintLayout.LayoutParams
+        val params = binding.playerView.layoutParams as FrameLayout.LayoutParams
         params.width = ViewGroup.LayoutParams.MATCH_PARENT
         params.height = ViewGroup.LayoutParams.MATCH_PARENT
-        params.dimensionRatio = null
         binding.playerView.layoutParams = params
         (requireActivity() as? AppCompatActivity)?.supportActionBar?.hide()
-        binding.detailVideo.visibility = View.GONE
+        binding.durationTraining.visibility = View.GONE
+        binding.description.visibility = View.GONE
     }
 
     private val playerListener = object : Player.Listener {

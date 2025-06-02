@@ -79,7 +79,6 @@ class TrainingsViewModel @Inject constructor(
                         }
 
                         is ResultFlow.Success -> {
-
                             val filters = state.value.filters ?: getFilters()
                             updateState {
                                 copy(
