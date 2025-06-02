@@ -6,10 +6,13 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.fragment.app.DialogFragment
 import androidx.recyclerview.widget.LinearLayoutManager
+import ru.ivan.eremin.treningtest.R
 import ru.ivan.eremin.treningtest.databinding.DialogTrainingFilterBinding
 import ru.ivan.eremin.treningtest.domain.entity.Filter
 import ru.ivan.eremin.treningtest.domain.entity.TypeTraining
+import ru.ivan.eremin.treningtest.presenter.exteption.toPx
 import ru.ivan.eremin.treningtest.presenter.ui.adapter.FilterAdapter
+import ru.ivan.eremin.treningtest.presenter.ui.adapter.MarginItemDecoration
 
 class FilterTrainingDialog : DialogFragment() {
 
@@ -30,12 +33,14 @@ class FilterTrainingDialog : DialogFragment() {
         super.onViewCreated(view, savedInstanceState)
         val filters = arguments?.getSerializable(FILTER_FIELD)
         binding.filters.layoutManager = LinearLayoutManager(requireContext())
+        dialog?.window?.setBackgroundDrawableResource(R.drawable.dialog_rounded_background)
         filters?.let {
             val adapter = FilterAdapter(it as ArrayList<Filter>)
             adapter.setOnClickListener {
                 onClick?.invoke(it)
                 dismiss()
             }
+            binding.filters.addItemDecoration(MarginItemDecoration(requireContext().toPx(4)))
             binding.filters.adapter = adapter
 
         }
