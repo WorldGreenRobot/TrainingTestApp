@@ -38,7 +38,7 @@ object NetworkModule {
             ignoreUnknownKeys = true
         }
         return Retrofit.Builder()
-            .baseUrl("https://ref.test.kolsa.ru/")
+            .baseUrl("")
             .client(okhttp)
             .addConverterFactory(json.asConverterFactory("application/json".toMediaType()))
             .build()
