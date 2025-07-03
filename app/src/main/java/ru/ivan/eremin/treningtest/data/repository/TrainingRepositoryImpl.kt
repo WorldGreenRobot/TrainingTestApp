@@ -13,7 +13,7 @@ import ru.ivan.eremin.treningtest.domain.repository.TrainingRepository
 import javax.inject.Inject
 
 class TrainingRepositoryImpl @Inject constructor(
-    private val service: TrainingService,
+    //private val service: TrainingService,
     private val requestHelper: RequestHelper,
     cache: AppCache
 ): TrainingRepository{

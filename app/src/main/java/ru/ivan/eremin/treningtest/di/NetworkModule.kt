@@ -55,8 +55,8 @@ object NetworkModule {
     fun getCache(): AppCache {
         return AppCache()
     }
-
+/*
     @Provides
     fun provideTrainingService(retrofit: Retrofit): TrainingService =
-        retrofit.create(TrainingService::class.java)
+        retrofit.create(TrainingService::class.java)*/
 }
